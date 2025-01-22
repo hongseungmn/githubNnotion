@@ -26,9 +26,12 @@ jobs:
       # 3. 변경된 코드 내용 저장
       - name: Save changes to files
         run: |
-          # 변경된 파일 목록을 반복하여 각 파일의 차이를 저장
           echo "Saving changed file diffs..."
-          changed_files="${{ steps.changes.outputs.files }}"
+          
+          # 변경된 파일 목록을 가져옴
+          changed_files=$(echo "${{ steps.changes.outputs.files }}" | tr -d '[]' | tr -s ',' '\n')
+
+          # 파일 목록을 반복하여 각 파일의 차이를 저장
           for file in $changed_files; do
             echo "Changes in $file" >> changed_files.txt
             git diff ${{ github.event.before }} ${{ github.sha }} -- $file >> changed_files.txt
@@ -41,3 +44,5 @@ jobs:
         with:
           name: changed-files-with-diffs
           path: changed_files.txt
+          if-no-files-found: warn
+          include-hidden-files: false
