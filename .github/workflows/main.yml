@@ -1,0 +1,38 @@
+name: Check Changes on Commit
+
+on:
+  push:
+    branches:
+      - main  # 주요 브랜치에서만 실행
+
+jobs:
+  check-changes:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 저장소 체크아웃
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. 변경 사항 확인
+      - name: Get changes
+        run: |
+          echo "Previous commit: ${{ github.event.before }}"
+          echo "Current commit: ${{ github.sha }}"
+
+          # 변경 파일 목록 가져오기
+          git diff --name-only ${{ github.event.before }} ${{ github.sha }}
+
+          # 변경된 파일 내용 가져오기 (선택 사항)
+          git diff ${{ github.event.before }} ${{ github.sha }}
+
+          # 변경된 파일 목록을 로그에 출력
+          echo "Changed files:"
+          git diff --name-only ${{ github.event.before }} ${{ github.sha }} | tee changed_files.txt
+
+      # 3. 추가 작업 예: 변경 파일 기반으로 처리
+      - name: Use changed files
+        run: |
+          while IFS= read -r file; do
+            echo "Processing file: $file"
+          done < changed_files.txt
