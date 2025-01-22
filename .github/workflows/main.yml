@@ -8,7 +8,6 @@ on:
       - main  # 주요 브랜치에서만 실행
 
 jobs:
-  
   check-changes:
     runs-on: ubuntu-latest
 
@@ -35,6 +34,7 @@ jobs:
             # 변경된 파일 목록을 로그에 출력
             echo "Changed files:"
             git diff --name-only ${{ github.event.before }} ${{ github.sha }} | tee changed_files.txt
+          fi
 
       # 3. 추가 작업 예: 변경 파일 기반으로 처리
       - name: Use changed files
