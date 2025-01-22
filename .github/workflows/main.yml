@@ -1,6 +1,4 @@
 name: Check Changes on Commit
-env:
-  ACTIONS_STEP_DEBUG: true
 
 on:
   push:
@@ -14,26 +12,12 @@ jobs:
     steps:
       # 1. 저장소 체크아웃
       - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # 모든 커밋을 가져옴
+
+      # 2. 변경 파일 확인
+      - name: Check changes
         uses: tj-actions/changed-files@v44
         with:
-          fetch-depth: 0  # 모든 커밋을 가져와야 이전 커밋에 접근 가능
-
-      # 2. 변경 사항 확인
-      - name: Get changes
-        run: |
-          if [[ "${{ github.event.before }}" == "00000000000000000000000000000" ]]; then
-            echo "This is the first commit or a new branch creation. Skipping diff."
-          else
-            echo "Previous commit: ${{ github.event.before }}"
-            echo "Current commit: ${{ github.sha }}"
-
-            # 변경 파일 목록 가져오기
-            git diff --name-only ${{ github.event.before }} ${{ github.sha }}
-
-            # 변경된 파일 내용 가져오기 (선택 사항)
-            git diff ${{ github.event.before }} ${{ github.sha }}
-
-            # 변경된 파일 목록을 로그에 출력
-            echo "Changed files:"
-            git diff --name-only ${{ github.event.before }} ${{ github.sha }} | tee changed_files.txt
-          fi
+          path: /home/runner/work/${{ github.repository }}
