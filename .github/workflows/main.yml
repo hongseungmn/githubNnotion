@@ -23,8 +23,21 @@ jobs:
         with:
           path: ${{ github.workspace }}
 
-      # 3. 변경된 파일 목록 출력
-      - name: Show changed files
+      # 3. 변경된 코드 내용 저장
+      - name: Save changes to files
         run: |
-          echo "Changed files:"
-          echo "${{ steps.changes.outputs.files }}"
+          # 변경된 파일 목록을 반복하여 각 파일의 차이를 저장
+          echo "Saving changed file diffs..."
+          changed_files="${{ steps.changes.outputs.files }}"
+          for file in $changed_files; do
+            echo "Changes in $file" >> changed_files.txt
+            git diff ${{ github.event.before }} ${{ github.sha }} -- $file >> changed_files.txt
+            echo -e "\n\n" >> changed_files.txt
+          done
+
+      # 4. 변경된 파일 목록과 내용을 아티팩트로 업로드
+      - name: Upload changed files with diffs as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: changed-files-with-diffs
+          path: changed_files.txt
