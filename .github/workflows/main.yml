@@ -14,12 +14,14 @@ jobs:
     steps:
       # 1. 저장소 체크아웃
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: tj-actions/changed-files@v44
+        with:
+          fetch-depth: 0  # 모든 커밋을 가져와야 이전 커밋에 접근 가능
 
       # 2. 변경 사항 확인
       - name: Get changes
         run: |
-          if [[ "${{ github.event.before }}" == "0000000000000000000000000000000000000000" ]]; then
+          if [[ "${{ github.event.before }}" == "00000000000000000000000000000" ]]; then
             echo "This is the first commit or a new branch creation. Skipping diff."
           else
             echo "Previous commit: ${{ github.event.before }}"
