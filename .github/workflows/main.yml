@@ -20,4 +20,5 @@ jobs:
       - name: Check changes
         uses: tj-actions/changed-files@v44
         with:
-          path: /Users/hongseongmin/GitHub/${{ github.repository }}
+          # path는 GitHub Actions의 기본 경로를 사용해야 함
+          path: ${{ github.workspace }}
