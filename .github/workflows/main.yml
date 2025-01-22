@@ -7,7 +7,7 @@ on:
 
 jobs:
   check-changes:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       # 1. 저장소 체크아웃
@@ -18,7 +18,13 @@ jobs:
 
       # 2. 변경 파일 확인
       - name: Check changes
+        id: changes
         uses: tj-actions/changed-files@v44
         with:
-          # path는 GitHub Actions의 기본 경로를 사용해야 함
           path: ${{ github.workspace }}
+
+      # 3. 변경된 파일 목록 출력
+      - name: Show changed files
+        run: |
+          echo "Changed files:"
+          echo "${{ steps.changes.outputs.files }}"
