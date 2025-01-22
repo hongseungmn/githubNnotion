@@ -35,10 +35,3 @@ jobs:
             echo "Changed files:"
             git diff --name-only ${{ github.event.before }} ${{ github.sha }} | tee changed_files.txt
           fi
-
-      # 3. 추가 작업 예: 변경 파일 기반으로 처리
-      - name: Use changed files
-        run: |
-          while IFS= read -r file; do
-            echo "Processing file: $file"
-          done < changed_files.txt
