@@ -20,4 +20,4 @@ jobs:
       - name: Check changes
         uses: tj-actions/changed-files@v44
         with:
-          path: /home/runner/work/${{ github.repository }}
+          path: /Users/hongseongmin/GitHub/${{ github.repository }}
