@@ -23,19 +23,19 @@ jobs:
         with:
           path: ${{ github.workspace }}
 
-      # 3. 변경된 코드 내용 저장
-      - name: Save changes to files
+      # 3. 변경된 코드 내용 저장 및 로그 출력
+      - name: Save changes to files and log output
         run: |
           echo "Saving changed file diffs..."
           
           # 변경된 파일 목록을 가져옴
           changed_files=$(echo "${{ steps.changes.outputs.files }}" | tr -d '[]' | tr -s ',' '\n')
 
-          # 파일 목록을 반복하여 각 파일의 차이를 저장
+          # 파일 목록을 반복하여 각 파일의 차이를 저장 및 로그로 출력
           for file in $changed_files; do
-            echo "Changes in $file" >> changed_files.txt
-            git diff ${{ github.event.before }} ${{ github.sha }} -- $file >> changed_files.txt
-            echo -e "\n\n" >> changed_files.txt
+            echo "Changes in $file" | tee -a changed_files.txt
+            git diff ${{ github.event.before }} ${{ github.sha }} -- $file | tee -a changed_files.txt
+            echo -e "\n\n" | tee -a changed_files.txt
           done
 
       # 4. 변경된 파일 목록과 내용을 아티팩트로 업로드
