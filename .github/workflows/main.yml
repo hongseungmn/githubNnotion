@@ -1,11 +1,47 @@
-name: Our Workflow
-on: push
+name: Save Changes on Push
+
+on:
+  push:
+    branches:
+      - main  # 주요 브랜치에서만 실행
+
 jobs:
-  checkout:
-    runs-on: ubuntu-24.04
+  save-changes:
+    runs-on: ubuntu-latest
+
     steps:
-      - run: ls -al # 현재 디렉토리 내용 출력
-      - uses: actions/checkout@v3
-      
-      - run: ls -al # 작업 디렉토리 내의 파일을 나열
-      - run: cat .github/workflows/main.yml # 워크플로우 YAML 파일의 내용을 출력
+      # 1. 저장소 체크아웃
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # 모든 커밋 데이터를 가져옴 (diff를 위해 필수)
+
+      # 2. 변경 정보 저장
+      - name: Save changes
+        run: |
+          echo "Collecting changes..."
+
+          # 변경된 파일 목록 저장
+          git diff --name-only ${{ github.event.before }} ${{ github.sha }} > changed_files.txt
+          
+          # 변경된 파일 내용 저장
+          git diff ${{ github.event.before }} ${{ github.sha }} > changes_with_diffs.txt
+
+          # 변경된 정보를 저장할 디렉토리 생성
+          mkdir -p diff-info
+
+          # 결과 파일 이동
+          mv changed_files.txt diff-info/
+          mv changes_with_diffs.txt diff-info/
+
+      # 3. 변경 정보 저장소에 커밋
+      - name: Commit changes
+        run: |
+          # git 사용자 설정
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@github.com"
+
+          # 변경된 내용 커밋 및 푸시
+          git add diff-info
+          git commit -m "Save changes and diffs on push"
+          git push origin main  # main 브랜치로 푸시 (필요 시 다른 브랜치를 설정 가능)
