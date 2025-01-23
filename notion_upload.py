@@ -77,6 +77,7 @@ if __name__ == "__main__":
       "Title": "새로운 페이지 제목입니다"
   }
   
+  
   payload = database.create_page_payload(data)
   print(payload)
   res = database.create_page(page_payload=payload)
