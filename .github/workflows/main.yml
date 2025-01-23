@@ -45,10 +45,11 @@ jobs:
           echo "Running Python script..."
           python3 process_changes.py diff-info/changed_files.txt diff-info/
 
-      # 5. 변경된 파일 확인 (디버깅용 로그)
-      - name: Output Debug Info
+      # 5. 새로운 Python 스크립트 실행
+      - name: Run New Python Script
         run: |
-          echo "Changed Files:"
-          cat diff-info/changed_files.txt
-          echo "Changes with Diffs:"
-          ls diff-info/
+          echo "Running new Python script..."
+          python3 notion_upload.py diff-info/
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          DATABASE_ID: ${{ secrets.TEST_DATABASE_ID }}
