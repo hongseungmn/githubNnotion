@@ -24,11 +24,11 @@ def process_changed_files(changed_files_path, changes_with_diffs_path):
                 continue  # 불필요한 diff 메타데이터는 건너뜀
 
             if line.startswith('+'):
-                print(f"+ {line[1:].strip()}")  # 추가된 내용
+                print(f"+ {line[1:]}")  # 추가된 내용
             elif line.startswith('-'):
-                print(f"- {line[1:].strip()}")  # 삭제된 내용
+                print(f"- {line[1:]}")  # 삭제된 내용
             else:
-                print(f"  {line.strip()}")  # 변경되지 않은 내용
+                print(f"  {line}")  # 변경되지 않은 내용
 
 if __name__ == "__main__":
     # 파일 경로를 인자로 받음
