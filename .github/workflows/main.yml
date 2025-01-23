@@ -20,25 +20,21 @@ jobs:
       - name: Save changes
         run: |
           echo "Collecting changes..."
-
-          # 변경된 파일 목록 저장
-          git diff --name-only ${{ github.event.before }} ${{ github.sha }} > changed_files.txt
           
-          # 변경된 파일 내용 저장
-          git diff ${{ github.event.before }} ${{ github.sha }} > changes_with_diffs.txt
-
-          # 변경된 정보를 저장할 디렉토리 생성
-          mkdir -p diff-info
-
-          # 결과 파일 이동
-          mv changed_files.txt diff-info/
-          mv changes_with_diffs.txt diff-info/
+          # 변경된 파일 목록 저장
+          git diff --name-only ${{ github.event.before }} ${{ github.sha }} > diff-info/changed_files.txt
+          
+          # 각 파일의 변경 사항을 파일별로 저장
+          while read file; do
+            echo "Saving changes for file: $file"
+            git diff ${{ github.event.before }} ${{ github.sha }} -- $file > "diff-info/${file//\//_}.diff"
+          done < diff-info/changed_files.txt
 
       # 3. Python 스크립트 실행
       - name: Run Python Script
         run: |
           echo "Running Python script..."
-          python3 process_changes.py diff-info/changed_files.txt diff-info/changes_with_diffs.txt
+          python3 process_changes.py diff-info/changed_files.txt diff-info/
 
       # 4. 변경된 파일 확인 (디버깅용 로그)
       - name: Output Debug Info
@@ -46,4 +42,4 @@ jobs:
           echo "Changed Files:"
           cat diff-info/changed_files.txt
           echo "Changes with Diffs:"
-          cat diff-info/changes_with_diffs.txt
+          ls diff-info/
