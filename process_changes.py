@@ -27,6 +27,9 @@ def process_changed_files(changed_files_path, diff_dir):
                 # diff 헤더, 인덱스 등 불필요한 부분을 제외하고 모든 라인 출력
                 if line.startswith('diff --git') or line.startswith('index') or line.startswith('---') or line.startswith('+++') or line.startswith('@@'):
                     continue  # 불필요한 diff 메타데이터는 건너뜀
+                  
+                # "\ No newline at end of file" 제거
+                line = line.replace("\\ No newline at end of file", "")
 
                 if line.startswith('+'):
                     print(f"+ {line[1:]}")  # 추가된 내용

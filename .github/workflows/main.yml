@@ -30,8 +30,7 @@ jobs:
           # 각 파일의 변경 사항을 파일별로 저장
           while read file; do
             echo "Saving changes for file: $file"
-            # git diff 출력에서 \ No newline at end of file 제거
-            git diff ${{ github.event.before }} ${{ github.sha }} -- $file | sed '/\\ No newline at end of file/d' > "diff-info/${file//\//_}.diff"
+            git diff ${{ github.event.before }} ${{ github.sha }} -- $file > "diff-info/${file//\//_}.diff"
           done < diff-info/changed_files.txt
 
       # 3. Python 스크립트 실행
