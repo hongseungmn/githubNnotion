@@ -52,4 +52,4 @@ jobs:
           python3 notion_upload.py diff-info/
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-          DATABASE_ID: ${{ secrets.TEST_DATABASE_ID }}
+          DATABASE_ID: ${{ secrets.DALIY_DEVELOPMENT_ID }}

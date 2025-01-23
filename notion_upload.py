@@ -1,5 +1,21 @@
 import requests
 import os
+import subprocess
+
+# 커밋 메시지와 설명 가져오기
+def get_commit_info():
+    result = subprocess.run(['git', 'log', '-1', '--pretty=format:%h %an %ad %s %b'], capture_output=True, text=True)
+    commit_data = result.stdout.strip()
+    
+    # 커밋 데이터 파싱
+    commit_parts = commit_data.split(' ', 4)  # 해시, 작성자, 날짜, 메시지, 본문으로 분리
+    commit_hash = commit_parts[0]  # 커밋 해시
+    commit_author = commit_parts[1]  # 작성자
+    commit_date = commit_parts[2]  # 날짜
+    commit_message = commit_parts[3]  # 메시지
+    commit_description = commit_parts[4] if len(commit_parts) > 4 else ""  # 본문 (있을 경우만)
+
+    return commit_date, commit_message, commit_description
 
 class Database:
   def __init__(self, header ,database_id):
@@ -18,13 +34,7 @@ class Database:
             "multi_select": [
                 {"name": item} for item in data.get("Subject", []) # 과목
             ]
-        },
-        "Created By": {
-            "people": [
-                {"id": createdId} for createdId in data.get("Created By", [])  # 생성자
-            ]
-        },
-        
+        },        
         "Title": {
             "title": [
                 {
@@ -68,18 +78,14 @@ if __name__ == "__main__":
       "Notion-Version": "2022-06-28" 
   }
   database = Database(header=headers, database_id=DATABASE_ID)
-  res = database.retrieve_database()
-  name = res.json()["last_edited_by"]["id"]
-
+  
+  commit_date, title, subject = get_commit_info()
   data = {
-      "Subject": ["test1", "test2"],
-      "Created By": [name],
-      "Title": "새로운 페이지 제목입니다"
+      "Subject": [subject],
+      "Title": title
   }
-  
-  
   payload = database.create_page_payload(data)
-  print(payload)
+  
   res = database.create_page(page_payload=payload)
   
   
