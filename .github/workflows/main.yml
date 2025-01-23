@@ -33,13 +33,19 @@ jobs:
             git diff ${{ github.event.before }} ${{ github.sha }} -- $file > "diff-info/${file//\//_}.diff"
           done < diff-info/changed_files.txt
 
-      # 3. Python 스크립트 실행
+      # 3. 필요한 Python 패키지 설치
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install requests
+
+      # 4. Python 스크립트 실행
       - name: Run Python Script
         run: |
           echo "Running Python script..."
           python3 process_changes.py diff-info/changed_files.txt diff-info/
 
-      # 4. 변경된 파일 확인 (디버깅용 로그)
+      # 5. 변경된 파일 확인 (디버깅용 로그)
       - name: Output Debug Info
         run: |
           echo "Changed Files:"
