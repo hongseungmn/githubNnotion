@@ -34,14 +34,13 @@ jobs:
           mv changed_files.txt diff-info/
           mv changes_with_diffs.txt diff-info/
 
-      # 3. 변경 정보 저장소에 커밋
-      - name: Commit changes
-        run: |
-          # git 사용자 설정
-          git config --global user.name "GitHub Actions Bot"
-          git config --global user.email "actions@github.com"
+          # 파일명 출력
+          echo "Files created:"
+          ls -l diff-info/
 
-          # 변경된 내용 커밋 및 푸시
-          git add diff-info
-          git commit -m "Save changes and diffs on push"
-          git push origin main  # main 브랜치로 푸시 (필요 시 다른 브랜치를 설정 가능)
+          # 파일 내용 출력
+          echo "=== Changed Files ==="
+          cat diff-info/changed_files.txt || echo "No files changed."
+
+          echo "=== Changes with Diffs ==="
+          cat diff-info/changes_with_diffs.txt || echo "No diff content."
