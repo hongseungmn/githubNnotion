@@ -1,4 +1,4 @@
-name: Save Changes on Push
+name: Save Changes and Run Python Script
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main  # 주요 브랜치에서만 실행
 
 jobs:
-  save-changes:
+  save-and-run:
     runs-on: ubuntu-latest
 
     steps:
@@ -14,9 +14,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # 모든 커밋 데이터를 가져옴 (diff를 위해 필수)
+          fetch-depth: 0
 
-      # 2. 변경 정보 저장
+      # 2. 변경된 파일 및 내용 저장
       - name: Save changes
         run: |
           echo "Collecting changes..."
@@ -34,13 +34,16 @@ jobs:
           mv changed_files.txt diff-info/
           mv changes_with_diffs.txt diff-info/
 
-          # 파일명 출력
-          echo "Files created:"
-          ls -l diff-info/
+      # 3. Python 스크립트 실행
+      - name: Run Python Script
+        run: |
+          echo "Running Python script..."
+          python3 process_changes.py diff-info/changed_files.txt diff-info/changes_with_diffs.txt
 
-          # 파일 내용 출력
-          echo "=== Changed Files ==="
-          cat diff-info/changed_files.txt || echo "No files changed."
-
-          echo "=== Changes with Diffs ==="
-          cat diff-info/changes_with_diffs.txt || echo "No diff content."
+      # 4. 변경된 파일 확인 (디버깅용 로그)
+      - name: Output Debug Info
+        run: |
+          echo "Changed Files:"
+          cat diff-info/changed_files.txt
+          echo "Changes with Diffs:"
+          cat diff-info/changes_with_diffs.txt
