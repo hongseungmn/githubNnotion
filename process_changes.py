@@ -35,7 +35,9 @@ def process_changed_files(changed_files_path, diff_dir):
                     file_content.append(line)
 
         # 파일 저장
-        with open(file.replace('/', '_'), 'w') as f:  # 파일명을 유효한 형태로 변경
+        # 파일명에 확장자 .txt 추가하여 저장
+        file_name = file.replace('/', '_') + ".txt"
+        with open(file_name, 'w') as f:  # 파일명을 유효한 형태로 변경
             f.write("\n".join(file_content))
 
 if __name__ == "__main__":
