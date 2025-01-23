@@ -1,23 +1,23 @@
 import requests
 import os
 import subprocess
+from datetime import datetime
+
 
 # 커밋 메시지와 설명 가져오기
 def get_commit_info():
-    result = subprocess.run(['git', 'log', '-1', '--pretty=format:%h %an %ad %s %b'], capture_output=True, text=True)
+    # git log를 이용하여 커밋 메시지와 본문을 가져옴
+    result = subprocess.run(['git', 'log', '-1', '--pretty=format:%s%n%b'], capture_output=True, text=True)
     commit_data = result.stdout.strip()
     
-    # 커밋 데이터 파싱
-    commit_parts = commit_data.split(' ', 4)  # 해시, 작성자, 날짜, 메시지, 본문으로 분리
-    commit_hash = commit_parts[0]  # 커밋 해시
-    commit_author = commit_parts[1]  # 작성자
-    commit_date = commit_parts[2]  # 날짜
-    commit_message = commit_parts[3]  # 메시지
-    commit_description = commit_parts[4] if len(commit_parts) > 4 else ""  # 본문 (있을 경우만)
+    # 커밋 메시지와 본문을 분리
+    commit_parts = commit_data.split('\n', 1)  # 커밋 메시지와 본문을 분리
+    commit_message = commit_parts[0]  # 커밋 메시지
+    commit_description = commit_parts[1] if len(commit_parts) > 1 else "Document"  # 커밋 본문
 
-    return commit_date, commit_message, commit_description
+    return commit_message, commit_description
 
-class Database:
+class DaliyDatabase:
   def __init__(self, header ,database_id):
     self.database_id = database_id
     self.header = header
@@ -32,9 +32,14 @@ class Database:
     properties = {
         "Subject": {
             "multi_select": [
-                {"name": item} for item in data.get("Subject", []) # 과목
+                {"name": item} for item in data.get("Subject") # 과목
             ]
-        },        
+        },
+        "Created At": {  # Created At 필드에 현재 날짜 추가
+            "date": {
+                "start": datetime.now().strftime("%Y-%m-%d")  # 현재 날짜 및 시간
+            }
+        },
         "Title": {
             "title": [
                 {
@@ -64,7 +69,9 @@ class Database:
     url = f"https://api.notion.com/v1/blocks/{page_id}/children"
     res = requests.get(url)
     print(res.status_code)
-    print(res.json())
+    
+    
+
   
 if __name__ == "__main__":
   
@@ -77,15 +84,14 @@ if __name__ == "__main__":
       "Content-Type": "application/json",
       "Notion-Version": "2022-06-28" 
   }
-  database = Database(header=headers, database_id=DATABASE_ID)
+  database = DaliyDatabase(header=headers, database_id=DATABASE_ID)
   
-  commit_date, title, subject = get_commit_info()
+  title, subject = get_commit_info()
   data = {
       "Subject": [subject],
       "Title": title
   }
+  
   payload = database.create_page_payload(data)
-  
   res = database.create_page(page_payload=payload)
-  
   
