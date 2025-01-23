@@ -1,48 +1,9 @@
-name: Check Changes on Commit
-
-on:
-  push:
-    branches:
-      - main  # 주요 브랜치에서만 실행
-
+name: Our Workflow
+on: push
 jobs:
-  check-changes:
+  checkout:
     runs-on: ubuntu-24.04
-
     steps:
-      # 1. 저장소 체크아웃
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0  # 모든 커밋을 가져옴
-
-      # 2. 변경 파일 확인
-      - name: Check changes
-        id: changes
-        uses: tj-actions/changed-files@v44
-        with:
-          path: ${{ github.workspace }}
-
-      # 3. 변경된 코드 내용 저장 및 로그 출력
-      - name: Save changes to files and log output
-        run: |
-          echo "Saving changed file diffs..."
+      - run: ls -al # 현재 디렉토리 내용 출력
+      - uses: actions/checkout@v3
           
-          # 변경된 파일 목록을 가져옴
-          changed_files=$(echo "${{ steps.changes.outputs.files }}" | tr -d '[]' | tr -s ',' '\n')
-
-          # 파일 목록을 반복하여 각 파일의 차이를 저장 및 로그로 출력
-          for file in $changed_files; do
-            echo "Changes in $file" | tee -a changed_files.txt
-            git diff ${{ github.event.before }} ${{ github.sha }} -- $file | tee -a changed_files.txt
-            echo -e "\n\n" | tee -a changed_files.txt
-          done
-
-      # 4. 변경된 파일 목록과 내용을 아티팩트로 업로드
-      - name: Upload changed files with diffs as artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: changed-files-with-diffs
-          path: changed_files.txt
-          if-no-files-found: warn
-          include-hidden-files: false
